@@ -1,31 +1,29 @@
 [workspace]
 name = "kilted-libpython-bug"
 authors = ["Erik Holum <eholum@gmail.com>"]
-channels = ["conda-forge", "https://prefix.dev/robostack-kilted"]
+channels = ["conda-forge"]
 platforms = ["linux-64", "linux-aarch64"]
 version = "0.1.0"
 
-[dependencies]
-cmake = ">=3.30,<4"
-ninja = ">=1.13,<2"
-colcon-common-extensions = ">=0.3.0,<0.4"
-python = ">=3.11,<3.13"
-ros-kilted-ros-base = "*"
-ros-kilted-tf2-eigen = "*"
-lttng-ust = ">=2.13.9,<3"
-mold = ">=2.40.4,<3"
-
 [tasks]
-# build = { cmd = "cmake -B build -G Ninja && cmake --build build" }
-# run = { cmd = "./build/tf2_eigen_bug" }
-
-build = { cmd = "colcon build" }
-run = { cmd = "bash -c 'source install/setup.bash && tf2_eigen_bug'" }
-clean = {cmd = "rm -r build install log"}
+check = { cmd = 'bash -c "file ${CONDA_PREFIX}/lib/libunique_identifier_msgs__rosidl_generator_py.so && readelf -d ${CONDA_PREFIX}/lib/libunique_identifier_msgs__rosidl_generator_py.so | grep NEEDED"' }
+repro = { cmd = 'bash -c "gcc -o test src/main.cpp -ldl -L${CONDA_PREFIX}/lib -Wl,-rpath,${CONDA_PREFIX}/lib && ./test"' }
 
 [activation.env]
-# CXXFLAGS = "-fuse-ld=mold"
-CMAKE_PREFIX_PATH = "${CONDA_PREFIX}"
 LD_LIBRARY_PATH = "${CONDA_PREFIX}/lib"
-LIBRARY_PATH = "${CONDA_PREFIX}/lib"
-LDFLAGS = "-L${CONDA_PREFIX}/lib -Wl,-rpath,${CONDA_PREFIX}/lib"
+
+[feature.kilted]
+channels = ["https://prefix.dev/robostack-kilted"]
+
+[feature.kilted.dependencies]
+ros-kilted-unique-identifier-msgs = "*"
+
+[feature.jazzy]
+channels = ["https://prefix.dev/robostack-jazzy"]
+
+[feature.jazzy.dependencies]
+ros-jazzy-unique-identifier-msgs = "*"
+
+[environments]
+kilted = { features = ["kilted"] }
+jazzy = { features = ["jazzy"] }
