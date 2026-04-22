@@ -5,9 +5,24 @@ channels = ["conda-forge"]
 platforms = ["linux-64", "linux-aarch64"]
 version = "0.1.0"
 
-[tasks]
-check = { cmd = 'bash -c "file ${CONDA_PREFIX}/lib/libunique_identifier_msgs__rosidl_generator_py.so && readelf -d ${CONDA_PREFIX}/lib/libunique_identifier_msgs__rosidl_generator_py.so | grep NEEDED"' }
-repro = { cmd = 'bash -c "gcc -o test src/main.cpp -ldl -L${CONDA_PREFIX}/lib -Wl,-rpath,${CONDA_PREFIX}/lib && ./test"' }
+[tasks.check]
+cmd = """
+bash -c '
+  LIB=${CONDA_PREFIX}/lib/libunique_identifier_msgs__rosidl_generator_py.so
+  echo "=== file ===" && file $LIB
+  echo "=== NEEDED ===" && readelf -d $LIB | grep NEEDED || echo "(none)"
+'
+"""
+
+[tasks.crash]
+cmd = """
+bash -c '
+  gcc -o test src/main.cpp -ldl \
+    -L${CONDA_PREFIX}/lib \
+    -Wl,-rpath,${CONDA_PREFIX}/lib \
+  && ./test
+'
+"""
 
 [activation.env]
 LD_LIBRARY_PATH = "${CONDA_PREFIX}/lib"
