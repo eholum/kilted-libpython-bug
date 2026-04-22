@@ -24,6 +24,17 @@ bash -c '
 '
 """
 
+[tasks.crash-fix]
+cmd = """
+bash -c '
+  gcc -o test src/main.cpp -ldl \
+    -L${CONDA_PREFIX}/lib \
+    -Wl,--no-as-needed -lpython3.12 \
+    -Wl,-rpath,${CONDA_PREFIX}/lib \
+  && ./test
+'
+"""
+
 [activation.env]
 LD_LIBRARY_PATH = "${CONDA_PREFIX}/lib"
 

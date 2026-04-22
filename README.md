@@ -18,6 +18,14 @@ $ pixi run -e kilted crash
 dlopen failed: /home/parallels/ROS/robostack/kilted-libpython-bug/.pixi/envs/kilted/lib/libunique_identifier_msgs__rosidl_generator_py.so: undefined symbol: PyObject_GetAttrString
 ```
 
+This can be fixed by forcing the linking to python for the binary at compile time with `-Wl,--no-as-needed -lpython3.12`:
+
+```
+$ pixi run -e kilted crash-fix
+
+OK
+```
+
 On jazzy:
 
 ```
